@@ -16,16 +16,41 @@ const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
+  // ✅ Sticky navbar shadow
   useEffect(() => {
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
+  // ✅ Lock background scroll when menu open (IMPORTANT mobile fix)
+  useEffect(() => {
+    if (isMobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileMenuOpen]);
+
+  // ✅ Scroll with offset (navbar height ~80px)
   const scrollToSection = (href) => {
     const element = document.querySelector(href);
-    if (element) element.scrollIntoView({ behavior: "smooth" });
+    if (!element) return;
+
+    // close menu first for better UX
     setIsMobileMenuOpen(false);
+
+    // wait for menu collapse animation to finish then scroll
+    setTimeout(() => {
+      const yOffset = -90; // navbar height offset
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }, 200);
   };
 
   return (
@@ -50,7 +75,6 @@ const Navbar = () => {
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            {/* logo tile */}
             <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
               <Pill className="w-5 h-5 text-white" />
             </div>
@@ -60,11 +84,12 @@ const Navbar = () => {
             </span>
           </motion.a>
 
-          {/* Desktop Navigation */}
+          {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) => (
               <motion.button
                 key={link.name}
+                type="button"
                 onClick={() => scrollToSection(link.href)}
                 className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors rounded-full hover:bg-white/10"
                 whileHover={{ scale: 1.05 }}
@@ -75,9 +100,10 @@ const Navbar = () => {
             ))}
           </div>
 
-          {/* CTA Button */}
+          {/* CTA */}
           <div className="hidden lg:block">
             <Button
+              type="button"
               onClick={() => scrollToSection("#contact")}
               className="rounded-full px-6 bg-white text-primary hover:bg-white/90 shadow-soft hover:shadow-soft-lg transition-all duration-300"
             >
@@ -85,9 +111,10 @@ const Navbar = () => {
             </Button>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Toggle */}
           <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            type="button"
+            onClick={() => setIsMobileMenuOpen((v) => !v)}
             className="lg:hidden p-2 rounded-xl hover:bg-white/10 transition-colors"
           >
             {isMobileMenuOpen ? (
@@ -99,24 +126,26 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* ✅ Mobile Menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: "auto" }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.25 }}
             className="lg:hidden bg-primary/95 backdrop-blur-md border-t border-white/10"
           >
             <div className="container-custom py-4 space-y-2">
               {navLinks.map((link, index) => (
                 <motion.button
                   key={link.name}
+                  type="button"
                   onClick={() => scrollToSection(link.href)}
-                  initial={{ opacity: 0, x: -20 }}
+                  initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: index * 0.05 }}
+                  exit={{ opacity: 0, x: -16 }}
+                  transition={{ delay: index * 0.04 }}
                   className="block w-full text-left px-4 py-3 text-base font-medium text-white/80 hover:text-white hover:bg-white/10 rounded-xl transition-colors"
                 >
                   {link.name}
@@ -124,12 +153,13 @@ const Navbar = () => {
               ))}
 
               <motion.div
-                initial={{ opacity: 0, y: 10 }}
+                initial={{ opacity: 0, y: 8 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.3 }}
+                transition={{ delay: 0.25 }}
                 className="pt-2"
               >
                 <Button
+                  type="button"
                   onClick={() => scrollToSection("#contact")}
                   className="w-full rounded-full bg-white text-primary hover:bg-white/90"
                 >
