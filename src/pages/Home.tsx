@@ -3,7 +3,7 @@ import Hero from '@/components/Hero';
 import Services from '@/components/Services';
 import About from '@/components/About';
 import WhyChooseUs from '@/components/WhyChooseUs';
-import Careers from '@/components/Careers';
+
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import WhatsappFloat from '@/components/WhatsappFloat';
@@ -18,7 +18,6 @@ const Home = () => {
       <Services />
       <About />
       <WhyChooseUs />
-      <Careers />
       <Contact />
       <Footer />
       <WhatsappFloat />

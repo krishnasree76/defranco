@@ -1,20 +1,25 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Pill } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import logo from "@/assets/logo.jpeg";
 
 const navLinks = [
   { name: "Home", href: "#home" },
   { name: "Services", href: "#services" },
   { name: "About", href: "#about" },
   { name: "Why Choose Us", href: "#why-choose-us" },
-  { name: "Careers", href: "#careers" },
+  { name: "Careers", href: "/careers" }, // ✅ correct
   { name: "Contact", href: "#contact" },
 ];
 
 const Navbar = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const navigate = useNavigate();
+  const location = useLocation();
 
   // ✅ Sticky navbar shadow
   useEffect(() => {
@@ -23,34 +28,48 @@ const Navbar = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // ✅ Lock background scroll when menu open (IMPORTANT mobile fix)
+  // ✅ Lock background scroll when menu open
   useEffect(() => {
-    if (isMobileMenuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
+    document.body.style.overflow = isMobileMenuOpen ? "hidden" : "";
     return () => {
       document.body.style.overflow = "";
     };
   }, [isMobileMenuOpen]);
 
-  // ✅ Scroll with offset (navbar height ~80px)
+  // ✅ Smooth scroll only for # links
   const scrollToSection = (href) => {
     const element = document.querySelector(href);
     if (!element) return;
 
-    // close menu first for better UX
     setIsMobileMenuOpen(false);
 
-    // wait for menu collapse animation to finish then scroll
     setTimeout(() => {
-      const yOffset = -90; // navbar height offset
+      const yOffset = -90;
       const y =
         element.getBoundingClientRect().top + window.pageYOffset + yOffset;
 
       window.scrollTo({ top: y, behavior: "smooth" });
-    }, 200);
+    }, 180);
+  };
+
+  // ✅ Handles both page routes and in-page scroll
+  const handleNavClick = (href) => {
+    // Case 1: Careers route
+    if (!href.startsWith("#")) {
+      setIsMobileMenuOpen(false);
+      navigate(href);
+      return;
+    }
+
+    // Case 2: Section scroll only works on homepage
+    if (location.pathname !== "/") {
+      // go to home first then scroll
+      navigate("/");
+      setTimeout(() => scrollToSection(href), 350);
+      return;
+    }
+
+    scrollToSection(href);
   };
 
   return (
@@ -64,54 +83,80 @@ const Navbar = () => {
     >
       <nav className="container-custom">
         <div className="flex items-center justify-between h-20">
-          {/* Logo */}
+          {/* ✅ Logo */}
           <motion.a
             href="#home"
             onClick={(e) => {
               e.preventDefault();
-              scrollToSection("#home");
+              handleNavClick("#home");
             }}
-            className="flex items-center gap-2"
+            className="flex items-center gap-3"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <div className="w-10 h-10 rounded-xl bg-white/15 border border-white/20 flex items-center justify-center">
-              <Pill className="w-5 h-5 text-white" />
-            </div>
+            <motion.div
+              whileHover={{ rotate: 3, scale: 1.04 }}
+              transition={{ type: "spring", stiffness: 260, damping: 18 }}
+              className={`w-12 h-12 rounded-full overflow-hidden flex items-center justify-center
+                border border-white/30 bg-white/10 shadow-soft
+                ${isScrolled ? "ring-2 ring-white/20 shadow-soft-lg" : ""}
+              `}
+            >
+              <img
+                src={logo}
+                alt="Defranco Pharmacy Logo"
+                className="w-full h-full object-cover"
+              />
+            </motion.div>
 
             <span className="text-xl font-bold text-white">
               Defranco <span className="text-white/80">Pharmacy</span>
             </span>
           </motion.a>
 
-          {/* Desktop Nav */}
+          {/* ✅ Desktop Nav */}
           <div className="hidden lg:flex items-center gap-1">
-            {navLinks.map((link) => (
-              <motion.button
-                key={link.name}
-                type="button"
-                onClick={() => scrollToSection(link.href)}
-                className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors rounded-full hover:bg-white/10"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                {link.name}
-              </motion.button>
-            ))}
+            {navLinks.map((link) =>
+              link.href.startsWith("#") ? (
+                <motion.button
+                  key={link.name}
+                  type="button"
+                  onClick={() => handleNavClick(link.href)}
+                  className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors rounded-full hover:bg-white/10"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  {link.name}
+                </motion.button>
+              ) : (
+                <motion.div
+                  key={link.name}
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                >
+                  <Link
+                    to={link.href}
+                    className="px-4 py-2 text-sm font-medium text-white/80 hover:text-white transition-colors rounded-full hover:bg-white/10 inline-block"
+                  >
+                    {link.name}
+                  </Link>
+                </motion.div>
+              )
+            )}
           </div>
 
-          {/* CTA */}
+          {/* ✅ CTA */}
           <div className="hidden lg:block">
             <Button
               type="button"
-              onClick={() => scrollToSection("#contact")}
+              onClick={() => handleNavClick("#contact")}
               className="rounded-full px-6 bg-white text-primary hover:bg-white/90 shadow-soft hover:shadow-soft-lg transition-all duration-300"
             >
               Contact Us
             </Button>
           </div>
 
-          {/* Mobile Toggle */}
+          {/* ✅ Mobile Toggle */}
           <button
             type="button"
             onClick={() => setIsMobileMenuOpen((v) => !v)}
@@ -141,7 +186,7 @@ const Navbar = () => {
                 <motion.button
                   key={link.name}
                   type="button"
-                  onClick={() => scrollToSection(link.href)}
+                  onClick={() => handleNavClick(link.href)}
                   initial={{ opacity: 0, x: -16 }}
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: -16 }}
@@ -160,7 +205,7 @@ const Navbar = () => {
               >
                 <Button
                   type="button"
-                  onClick={() => scrollToSection("#contact")}
+                  onClick={() => handleNavClick("#contact")}
                   className="w-full rounded-full bg-white text-primary hover:bg-white/90"
                 >
                   Contact Us

@@ -1,11 +1,14 @@
 import { motion } from "framer-motion";
-import { Pill, Phone, Mail, MapPin } from "lucide-react";
+import { Phone, Mail, MapPin } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
+
+import logo from "@/assets/logo.jpeg";
 
 const quickLinks = [
   { name: "Home", href: "#home" },
   { name: "Services", href: "#services" },
   { name: "About", href: "#about" },
-  { name: "Careers", href: "#careers" },
+  { name: "Careers", href: "/careers" }, // ✅ updated
   { name: "Contact", href: "#contact" },
 ];
 
@@ -23,10 +26,39 @@ const fadeUp = {
 };
 
 const Footer = () => {
-  // ✅ removed TS ": string"
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  // ✅ scroll with offset (navbar fixed)
   const scrollToSection = (href) => {
     const element = document.querySelector(href);
-    if (element) element.scrollIntoView({ behavior: "smooth" });
+    if (!element) return;
+
+    setTimeout(() => {
+      const yOffset = -90;
+      const y =
+        element.getBoundingClientRect().top + window.pageYOffset + yOffset;
+
+      window.scrollTo({ top: y, behavior: "smooth" });
+    }, 80);
+  };
+
+  // ✅ handle both route & scroll links
+  const handleFooterLink = (href) => {
+    // route
+    if (!href.startsWith("#")) {
+      navigate(href);
+      return;
+    }
+
+    // scroll section
+    if (location.pathname !== "/") {
+      navigate("/");
+      setTimeout(() => scrollToSection(href), 350);
+      return;
+    }
+
+    scrollToSection(href);
   };
 
   return (
@@ -40,16 +72,22 @@ const Footer = () => {
           viewport={{ once: true, amount: 0.35 }}
           className="grid md:grid-cols-2 lg:grid-cols-4 gap-10"
         >
-          {/* Brand */}
+          {/* ✅ Brand */}
           <motion.div variants={fadeUp}>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-3 mb-4">
+              {/* ✅ Logo */}
               <motion.div
-                whileHover={{ rotate: 6, scale: 1.03 }}
+                whileHover={{ rotate: 6, scale: 1.05 }}
                 transition={{ type: "spring", stiffness: 240, damping: 16 }}
-                className="w-10 h-10 rounded-xl bg-primary-foreground/10 flex items-center justify-center"
+                className="w-12 h-12 rounded-full overflow-hidden border border-white/20 bg-white/10 shadow-soft flex items-center justify-center"
               >
-                <Pill className="w-5 h-5 text-primary-foreground" />
+                <img
+                  src={logo}
+                  alt="Defranco Pharmacy Logo"
+                  className="w-full h-full object-cover"
+                />
               </motion.div>
+
               <span className="text-xl font-bold">Defranco Pharmacy</span>
             </div>
 
@@ -66,7 +104,8 @@ const Footer = () => {
               {quickLinks.map((link) => (
                 <li key={link.name}>
                   <motion.button
-                    onClick={() => scrollToSection(link.href)}
+                    type="button"
+                    onClick={() => handleFooterLink(link.href)}
                     whileHover={{ x: 6 }}
                     transition={{ duration: 0.2, ease }}
                     className="text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
@@ -89,7 +128,6 @@ const Footer = () => {
                   transition={{ duration: 0.2, ease }}
                   className="flex items-center gap-2 text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
                 >
-                  <Phone className="w-4 h-4" />
                   +1 (718) 893-2400
                 </motion.a>
               </li>
@@ -101,7 +139,6 @@ const Footer = () => {
                   transition={{ duration: 0.2, ease }}
                   className="flex items-center gap-2 text-primary-foreground/70 hover:text-primary-foreground transition-colors text-sm"
                 >
-                  <Mail className="w-4 h-4" />
                   defrancorx@gmail.com
                 </motion.a>
               </li>
