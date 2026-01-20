@@ -170,17 +170,34 @@ const Footer = () => {
         </motion.div>
 
         {/* ✅ Copyright */}
-        <motion.div
-          initial={{ opacity: 0, y: 14 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          transition={{ duration: 0.75, ease, delay: 0.1 }}
-          className="mt-12 pt-8 border-t border-primary-foreground/10 text-center"
-        >
-          <p className="text-primary-foreground/50 text-sm">
-            © {new Date().getFullYear()} Defranco Pharmacy. All rights reserved.
-          </p>
-        </motion.div>
+        {/* ✅ Copyright */}
+<motion.div
+  initial={{ opacity: 0, y: 14 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true, amount: 0.2 }}
+  transition={{ duration: 0.75, ease, delay: 0.1 }}
+  className="mt-12 pt-8 border-t border-primary-foreground/10 text-center space-y-2"
+>
+  <p className="text-primary-foreground/50 text-sm">
+    © {new Date().getFullYear()} Defranco Pharmacy. All rights reserved.
+  </p>
+
+  {/* ✅ Made with heart */}
+  <p className="text-primary-foreground/60 text-sm flex items-center justify-center gap-1">
+    Made with
+    <span className="text-primary font-semibold">♥</span>
+    by{" "}
+    <a
+      href="https://www.staffarc.in/"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-primary font-semibold hover:underline"
+    >
+      StaffArc
+    </a>
+  </p>
+</motion.div>
+
       </div>
     </footer>
   );

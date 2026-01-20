@@ -5,7 +5,7 @@ import About from '@/components/About';
 import WhyChooseUs from '@/components/WhyChooseUs';
 
 import Contact from '@/components/Contact';
-import Footer from '@/components/Footer';
+// import Footer from '@/components/Footer';
 import WhatsappFloat from '@/components/WhatsappFloat';
 import CallFloat from '@/components/CallFloat';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -19,7 +19,7 @@ const Home = () => {
       <About />
       <WhyChooseUs />
       <Contact />
-      <Footer />
+      {/* <Footer /> */}
       <WhatsappFloat />
       <CallFloat />
       <ScrollToTop />
